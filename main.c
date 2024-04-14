@@ -40,7 +40,7 @@ struct Card {
 void initialize_deck(struct Card *deck);
 void shuffle(struct Card *deck, int size);
 void swap(struct Card *x, struct Card *y);
-void deal_card(struct Card *player_hand, struct Card *deck, int track);
+void deal_card(struct Card *player_hand, struct Card *deck, int *track);
 
 void initialize_deck(struct Card *deck)
 {
@@ -71,9 +71,10 @@ void shuffle(struct Card *deck, int size)
     }
 }
 
-void deal_card(struct Card *player_hand, struct Card *deck, int track)
+void deal_card(struct Card *player_hand, struct Card *deck, int *track)
 {
-     
+     player_hand[*track] = deck[*track];
+     *track = *track + 1;
 }
 
 int main(void)
@@ -81,6 +82,7 @@ int main(void)
     srand(time(NULL));
     struct Card deck[DECK_SIZE];
     struct Card player_hand[MAX_CARDS];
+    struct Card dealer_hand[MAX_CARDS];
 
     int bet;
     int track = 0; /* Tracks the amount of dealt cards */
@@ -93,7 +95,13 @@ int main(void)
     initialize_deck(deck);
     shuffle(deck, DECK_SIZE);
 
+    deal_card(player_hand, deck, &track);
 
+    printf("%d\n", track);
+
+    for (int i = 0; i < track; i++) {
+        printf("%s%s\n", player_hand[i].rank, player_hand[i].suit);
+    }
    
     return 0;
 }
