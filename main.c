@@ -4,6 +4,7 @@
 #include <time.h>
 
 #define DECK_SIZE 52
+#define MAX_CARDS 11 /* Maximum amount of cards per Hand */
 
 enum Suits { HEARTS, CLUBS, DIAMONDS, SPADES };
 enum Ranks { ACE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING };
@@ -39,6 +40,7 @@ struct Card {
 void initialize_deck(struct Card *deck);
 void shuffle(struct Card *deck, int size);
 void swap(struct Card *x, struct Card *y);
+void deal_card(struct Card *player_hand, struct Card *deck, int track);
 
 void initialize_deck(struct Card *deck)
 {
@@ -69,7 +71,7 @@ void shuffle(struct Card *deck, int size)
     }
 }
 
-void deal_card()
+void deal_card(struct Card *player_hand, struct Card *deck, int track)
 {
      
 }
@@ -78,23 +80,20 @@ int main(void)
 {
     srand(time(NULL));
     struct Card deck[DECK_SIZE];
+    struct Card player_hand[MAX_CARDS];
 
     int bet;
-    int tracker;
-    
+    int track = 0; /* Tracks the amount of dealt cards */
+
     system("clear");
 
     printf("Place bet: ");
     scanf("%d", &bet);
 
-    
     initialize_deck(deck);
-
-    for (int i = 0; i < DECK_SIZE; i++) {
-        printf("%s%s\n", deck[i].rank, deck[i].suit);
-    }
-
     shuffle(deck, DECK_SIZE);
+
+
    
     return 0;
 }
