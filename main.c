@@ -40,10 +40,10 @@ struct Card {
 
 void initialize_deck(struct Card *deck);
 void shuffle(struct Card *deck, int size);
-void swap(struct Card *x, struct Card *y);
 void deal_card(struct Card *hand, struct Card *deck, int *track);
 void print_hand(struct Card *hand, int track);
 int menu();
+int eval(struct Card *hand, int track);
 
 void initialize_deck(struct Card *deck)
 {
@@ -58,19 +58,14 @@ void initialize_deck(struct Card *deck)
     }
 }
 
-void swap(struct Card *x, struct Card *y)
-{
-    struct Card tmp = *x;
-    *x = *y;
-    *y = tmp;
-}
-
 void shuffle(struct Card *deck, int size)
 {
     int rng;
     for (int i = size - 1; i > 0; i--) {
         rng = rand() % (i + 1);
-        swap(&deck[i], &deck[rng]);
+        struct Card tmp = deck[i];
+        deck[i] = deck[rng];
+        deck[rng] = tmp;
     }
 }
 
@@ -83,7 +78,7 @@ void deal_card(struct Card *hand, struct Card *deck, int *track)
 void print_hand(struct Card *hand, int track)
 {
     for (int i = 0; i < track; i++) {
-        printf("\033[47m%s%s \033[0m", hand[i].rank, hand[i].suit);
+        printf("%s%s ", hand[i].rank, hand[i].suit);
     }
     printf("\n");
 }
@@ -97,6 +92,33 @@ int menu()
     printf("\033[35m> \033[0m");
     scanf("%d", &action);
     return action;
+}
+
+int eval(struct Card *hand, int track)
+{
+    int sum = 0;
+    int num_aces = 0;
+
+    for (int i = 0; i < track; i++) {
+        if (strcmp(hand[i].rank, "A") == 0) {
+            num_aces++;
+        } else if (strcmp(hand[i].rank, "J") == 0 || strcmp(hand[i].rank, "Q") == 0 || strcmp(hand[i].rank, "K") == 0) {
+            sum += 10;
+        } else {
+            sum += atoi(hand[i].rank);
+        }
+    }
+
+    while (num_aces > 0) {
+        if (sum + 11 <= 21) {
+            sum += 11;
+        } else {
+            sum += 1;
+        }
+        num_aces--;
+    }
+    
+    return sum
 }
 
 int main(void)
@@ -115,15 +137,21 @@ int main(void)
     initialize_deck(deck);
     shuffle(deck, DECK_SIZE);
 
-    while (gameloop) {
-        action = menu();
-        if (action == 1)
-            deal_card(player_hand, deck, &track);
-        else if (action == 2)
-            gameloop = false;
-        
-        print_hand(player_hand, track);
-    }
+    deal_card(player_hand, deck, &track);
+    deal_card(player_hand, deck, &track);
+    print_hand(player_hand, track);
+
+    eval(player_hand, track);
+
+    // while (gameloop) {
+    //     action = menu();
+    //     if (action == 1)
+    //         deal_card(player_hand, deck, &track);
+    //     else if (action == 2)
+    //         gameloop = false;
+    //     
+    //     print_hand(player_hand, track);
+    // }
         
     return 0;
 }
