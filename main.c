@@ -38,12 +38,18 @@ struct Card {
     char rank[10];
 };
 
+struct Card deck[DECK_SIZE];
+struct Card player_hand[MAX_CARDS];
+struct Card dealer_hand[MAX_CARDS];
+
+/* Function prototypes */
 void initialize_deck(struct Card *deck);
 void shuffle(struct Card *deck, int size);
 void deal_card(struct Card *hand, struct Card *deck, int *track);
 void print_hand(struct Card *hand, int track);
 int menu();
 int eval(struct Card *hand, int track);
+
 
 void initialize_deck(struct Card *deck)
 {
@@ -72,15 +78,17 @@ void shuffle(struct Card *deck, int size)
 void deal_card(struct Card *hand, struct Card *deck, int *track)
 {
     hand[*track] = deck[*track];
-    *track = *track + 1;
+    //if (hand == player_hand)
+        *track = *track + 1;
 }
 
 void print_hand(struct Card *hand, int track)
 {
     for (int i = 0; i < track; i++) {
+        //printf("%s:\n", (hand == player_hand) ? "Your Hand" : "Dealers Hand" );
         printf("%s%s ", hand[i].rank, hand[i].suit);
     }
-    printf("\n");
+    printf("\nValue: %d\n", eval(hand, track));
 }
 
 int menu()
@@ -118,15 +126,12 @@ int eval(struct Card *hand, int track)
         num_aces--;
     }
     
-    return sum
+    return sum;
 }
 
 int main(void)
 {
     srand(time(NULL));
-    struct Card deck[DECK_SIZE];
-    struct Card player_hand[MAX_CARDS];
-    struct Card dealer_hand[MAX_CARDS];
 
     int bet, action;
     int track = 0; /* Tracks the amount of dealt cards */
@@ -138,20 +143,25 @@ int main(void)
     shuffle(deck, DECK_SIZE);
 
     deal_card(player_hand, deck, &track);
+    deal_card(dealer_hand, deck, &track);    
     deal_card(player_hand, deck, &track);
-    print_hand(player_hand, track);
 
-    eval(player_hand, track);
 
-    // while (gameloop) {
-    //     action = menu();
-    //     if (action == 1)
-    //         deal_card(player_hand, deck, &track);
-    //     else if (action == 2)
-    //         gameloop = false;
-    //     
-    //     print_hand(player_hand, track);
-    // }
+
+    while (gameloop) {
+
+        print_hand(player_hand, track);
+        printf("\n\n");
+        print_hand(dealer_hand, track);
+
+        action = menu();
+        if (action == 1)
+            deal_card(player_hand, deck, &track);
+        else if (action == 2)
+            while (eval(dealer_hand, track) <= 17)
+                deal_card(dealer_hand, deck, &track);
+
+    }
         
     return 0;
 }
