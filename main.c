@@ -49,7 +49,7 @@ void deal_card(struct Card *hand, struct Card *deck, int *track);
 void print_hand(struct Card *hand, int track);
 int menu();
 int eval(struct Card *hand, int track);
-
+int check_win(struct Card *player, struct Card *dealer, int track);
 
 void initialize_deck(struct Card *deck)
 {
@@ -129,6 +129,21 @@ int eval(struct Card *hand, int track)
     return sum;
 }
 
+int check_win(struct Card *player, struct Card *dealer, int track)
+{
+    int win;
+    if (eval(player, track) > 21)
+        win = 0;
+    else if (eval(dealer, track) > 21)
+        win = 1;
+    else if (eval(player, track) > eval(dealer, track))
+        win = 0;
+    else
+        win = 1;
+
+    return win;
+}
+
 int main(void)
 {
     srand(time(NULL));
@@ -146,8 +161,6 @@ int main(void)
     deal_card(dealer_hand, deck, &track);    
     deal_card(player_hand, deck, &track);
 
-
-
     while (gameloop) {
 
         print_hand(player_hand, track);
@@ -155,12 +168,20 @@ int main(void)
         print_hand(dealer_hand, track);
 
         action = menu();
-        if (action == 1)
+
+        if (action == 1) {
             deal_card(player_hand, deck, &track);
-        else if (action == 2)
+        } else if (action == 2) {
             while (eval(dealer_hand, track) <= 17)
                 deal_card(dealer_hand, deck, &track);
-
+        }
+    
+        if (check_win(player_hand, dealer_hand, track) == 1) {
+            printf("Loss!\n");
+        } else {
+            printf("Win!\n"); 
+        }
+        
     }
         
     return 0;
